@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Заявки</title>
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="/static/js/js_frameworks/vue.js"></script>
+    <script src="/static/js/js_frameworks/axios.js"></script>
+    <script src="/static/js/js_frameworks/lodash.js"></script>
+</head>
+<body class="container">
+<h3 class="my-4">Технические заключения</h3>
+<hr>
+<div class="row" id="mainApp">
+    {% verbatim %}
+    <div class="col">
+        <div class="hstack d-flex">
+            <span class="fs-4 text-uppercase mb-1">Журнал заключений</span>
+            <button class="btn btn-dark ms-auto" onclick="mainApp.newTC()">Создать пустое</button>
+        </div>
+        <div class="card mt-1 vh-100 overflow-y-visible">
+            <div v-for="obj in tcObjectsList" style="cursor: pointer" class="card m-1" @click="replaceTC(obj)">
+                <div class="card-header p-2 d-flex">
+                    <span class="fw-bold">№ {{ obj.tc_id }}</span>
+                    <span class="ms-2">{{ obj.tc_organisation }}</span>
+                    <span class="ms-auto">{{ obj.tc_date }}</span>
+                </div>
+                <div class="card-body p-2">
+                    <span><b>Наименование объекта: </b>{{ obj.object_name }}</span><br>
+                    <span><b>Неисправности: </b>{{ obj.object_troubles }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hstack gap-2 mb-2">
+            <span class="fs-4 w-100 text-uppercase">Техническое заключение №</span>
+            <input v-model="tcObject.tc_id" type="text" class="form-control" style="width: 100%; max-width: 16em">
+        </div>
+        <input v-model="tcObject.tc_date" type="date" class="form-control mb-2" title="Дата заключения">
+        <input v-model="tcObject.tc_organisation" type="text" class="form-control"
+               placeholder="Наименование организации">
+        <div class="card mt-2">
+            <span class="card-header">Данные объекта</span>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="object_name" class="form-label">Наименование объекта</label>
+                    <input v-model="tcObject.object_name" type="text" class="form-control" id="object_name">
+                </div>
+                <div class="mb-3">
+                    <label for="inventory_id" class="form-label">Инвентарный номер</label>
+                    <input v-model="tcObject.object_inventory_id" type="text" class="form-control" id="inventory_id">
+                </div>
+                <div class="mb-3">
+                    <label for="creation_id" class="form-label">Заводской номер</label>
+                    <input v-model="tcObject.object_creation_id" type="text" class="form-control" id="creation_id">
+                </div>
+                <div class="mb-3">
+                    <label for="creation_year" class="form-label">Год выпуска</label>
+                    <input v-model="tcObject.object_creation_year" type="text" class="form-control" id="creation_year">
+                </div>
+                <div class="mb-3">
+                    <label for="start_using_date" class="form-label">Дата принятия к бухгалтерскому учёту
+                        (ввода в эксплуатацию)</label>
+                    <input v-model="tcObject.object_start_using" type="text" class="form-control" id="start_using_date">
+                </div>
+                <div>
+                    <label for="fix_count" class="form-label">Количество ремонтов</label>
+                    <input v-model="tcObject.object_fix_count" type="text" class="form-control" id="fix_count">
+                </div>
+            </div>
+        </div>
+        <div class="card my-2">
+            <span class="card-header">Результаты обследования</span>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="object_troubles" class="form-label">Выявленные неисправности</label>
+                    <textarea v-model="tcObject.object_troubles" class="form-control" id="object_troubles"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="object_reason" class="form-label">Причина выбытия объекта из эксплуатации</label>
+                    <textarea v-model="tcObject.object_reason" class="form-control" id="object_reason"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="object_reuse_info" class="form-label">
+                        Предложения о возможности дальнейшего использования объекта по тому
+                        или иному назначению</label>
+                    <textarea v-model="tcObject.object_reuse_info" class="form-control"
+                              id="object_reuse_info"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="object_reuse_mats_info" class="form-label">
+                        Предложения о возможности использования частей объекта и его материалов</label>
+                    <textarea v-model="tcObject.object_reuse_mats_info" class="form-control"
+                              id="object_reuse_mats_info"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="object_metals" class="form-label">
+                        Сведения о наличии в объекте цветных, драгоценных или редкоземельных металлов</label>
+                    <textarea v-model="tcObject.object_metals_info" class="form-control" id="object_metals"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="object_danger_info" class="form-label">
+                        Сведения о наличии в объекте(его частях) веществ, свойств, частей,
+                        потенциально опасных для человека</label>
+                    <textarea v-model="tcObject.object_danger_info" class="form-control"
+                              id="object_danger_info"></textarea>
+                </div>
+                <div>
+                    <label for="object_conclusion" class="form-label">Заключение о техническом состоянии объекта</label>
+                    <textarea v-model="tcObject.object_conclusion" class="form-control"
+                              id="object_conclusion"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="hstack gap-2 mb-4">
+            <button v-if="isSaved && !isNew" class="btn btn-danger" onclick="mainApp.deleteTC()">Удалить</button>
+            <button class="btn btn-success ms-auto" onclick="mainApp.saveTC()">Сохранить</button>
+            <button class="btn btn-info" onclick="mainApp.downloadTC()">Скачать</button>
+        </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">{{ errTitle }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+            </div>
+            <div class="toast-body">
+                {{ errMsg }}
+            </div>
+        </div>
+    </div>
+    {% endverbatim %}
+</div>
+<script src="{% static 'js/js_frameworks/bootstrap.js' %}"></script>
+<script src="/static/js/js_main/main.js"></script>
+</body>
+</html>
