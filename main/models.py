@@ -2,6 +2,7 @@ from django.db import models
 from rest_framework.serializers import ModelSerializer
 
 
+# Модель объекта для базы данных
 class TechnicalConclusion(models.Model):
     # Данные о техническом заключении
     tc_id = models.CharField("Номер заключения", max_length=32, primary_key=True)

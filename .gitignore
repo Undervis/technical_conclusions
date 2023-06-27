@@ -1,0 +1,4 @@
+/main/migrations/
+/main/migrations/0001_initial.py
+/main/migrations/0002_remove_technicalconclusion_id_and_more.py
+/main/migrations/__init__.py

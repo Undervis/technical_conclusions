@@ -122,17 +122,19 @@ let mainApp = new Vue({
             }
         },
         downloadTC: function () {
+            // Выполнение запроса на скачивание файла с передачей объекта в качестве параметров запроса
             axios.get('/download_file', {params: this.tcObject, responseType: 'blob'})
                 .then((response) => {
                     const href = URL.createObjectURL(response.data)
-
+                    // при успешном выполнении запроса, создается временный элемент с сылкой
                     const link = document.createElement('a');
                     link.href = href;
                     link.setAttribute('download',
                         this.tcObject.tc_id + " - " + this.tcObject.object_name + '.docx');
                     document.body.appendChild(link);
+                    // автоматический клик на ссылку и скачивание
                     link.click();
-
+                    // после скачивания файла, элемент удаляется
                     document.body.removeChild(link);
                     URL.revokeObjectURL(href);
                     console.log(response)
