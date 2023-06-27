@@ -1,0 +1,3 @@
+html[data-bs-theme='dark'] #theme-icon {
+    filter: invert(1);
+}

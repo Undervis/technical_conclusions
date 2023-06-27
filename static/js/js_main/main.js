@@ -2,6 +2,7 @@ let mainApp = new Vue({
     el: "#mainApp",
     data: {
         tcObjectsList: [],
+        filteredTCObjects: [],
         tcObject: {
             tc_id: "", tc_date: "", tc_organisation: "",
             object_name: "", object_inventory_id: "", object_creation_id: "", object_creation_year: "",
@@ -20,7 +21,8 @@ let mainApp = new Vue({
         isSaved: true,
         isNew: true,
         errTitle: "",
-        errMsg: ""
+        errMsg: "",
+        searchQuery: ""
     },
     created: function () {
         this.getTCList()
@@ -32,9 +34,21 @@ let mainApp = new Vue({
             handler: function (oldValue, newValue) {
                 this.isSaved = false
             }
+        },
+        searchQuery: {
+            handler: function (oldValue, newValue){
+                this.searchObj(this.tcObjectsList)
+            }
         }
     },
     methods: {
+        searchObj: function (objects) {
+            if(this.searchQuery !== ""){
+                this.filteredTCObjects = objects.filter(obj => obj.object_name.toLowerCase().includes(this.searchQuery.toLowerCase()));
+            } else {
+                this.filteredTCObjects = objects
+            }
+        },
         showPopUp: function (title, msg) {
             const toastLiveExample = document.getElementById('liveToast')
             const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
@@ -46,6 +60,7 @@ let mainApp = new Vue({
             axios.get("/api/tech_conclusion")
                 .then((response) => {
                     this.tcObjectsList = response.data
+                    this.searchObj(this.tcObjectsList)
                 })
                 .catch((error) => {
                     alert(error)

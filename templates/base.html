@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en" data-bs-theme="dark">
+<html id="html" lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <title>Заявки</title>
@@ -11,17 +11,45 @@
     <script src="/static/js/js_frameworks/lodash.js"></script>
 </head>
 <body class="container-fluid px-5">
-<h3 class="my-4">Технические заключения</h3>
+<div class="hstack">
+    <h3 class="my-4">Технические заключения</h3>
+    <a class="ms-auto" onclick="changeTheme()">
+        <img id="theme-icon" src="/static/icons/moon.svg" class="me-2 dropdown-icon">
+    </a>
+    <script>
+        let changeTheme = function () {
+            const theme = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("theme="))
+                ?.split("=")[1];
+            if (theme) {
+                if (theme === "light") {
+                    document.getElementById('html').setAttribute('data-bs-theme', 'dark')
+                    document.getElementById('theme-icon').setAttribute('src', '/static/icons/sun.svg')
+                    document.cookie = 'theme=dark'
+                } else {
+                    document.getElementById('html').setAttribute('data-bs-theme', 'light')
+                    document.getElementById('theme-icon').setAttribute('src', '/static/icons/moon.svg')
+                    document.cookie = 'theme=light'
+                }
+            } else {
+                document.cookie = 'theme=light'
+            }
+        }
+    </script>
+</div>
 <hr>
 <div class="row" id="mainApp">
     {% verbatim %}
     <div class="col">
         <div class="hstack d-flex">
             <span class="fs-4 text-uppercase mb-1">Журнал заключений</span>
+            <input type="search" class="form-control w-50 mx-auto"
+                   placeholder="Поиск по наименованию объекта" v-model="searchQuery">
             <button class="btn btn-dark ms-auto" onclick="mainApp.newTC()">Создать пустое</button>
         </div>
         <div class="card mt-1 vh-100 overflow-y-visible">
-            <div v-for="obj in tcObjectsList" style="cursor: pointer" class="card m-1" @click="replaceTC(obj)">
+            <div v-for="obj in filteredTCObjects" style="cursor: pointer" class="card m-1" @click="replaceTC(obj)">
                 <div class="card-header p-2 d-flex">
                     <span class="fw-bold">№ {{ obj.tc_id }}</span>
                     <span class="ms-2">{{ obj.tc_organisation }}</span>
@@ -135,6 +163,18 @@
     {% endverbatim %}
 </div>
 <script src="{% static 'js/js_frameworks/bootstrap.js' %}"></script>
+<script>
+    const theme = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("theme="))
+        ?.split("=")[1];
+    document.getElementById("html").setAttribute('data-bs-theme', theme)
+    if (theme === 'light') {
+        document.getElementById("theme-icon").setAttribute('src', '/static/icons/moon.svg')
+    } else {
+        document.getElementById("theme-icon").setAttribute('src', '/static/icons/sun.svg')
+    }
+</script>
 <script src="/static/js/js_main/main.js"></script>
 </body>
 </html>
